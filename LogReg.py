@@ -14,6 +14,7 @@ x_test = (x_test - np.mean(x_test)) / np.std(x_test)
 y_train = y_train.reshape(y_train.shape[0],1)
 y_test = y_test.reshape(y_test.shape[0],1)
 '''
+#importing mnist from tenserflow and performing z-score normalization
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data() # convert data type to float 32
 x_train=np.float32(x_train)
 
@@ -33,6 +34,7 @@ print(y_train.shape)
 print(x_test.shape)
 print(y_test.shape)
 
+#separating data based on label
 y_train0=(y_train==0).astype(int)
 y_train1=(y_train==1).astype(int)
 y_train2=(y_train==2).astype(int)
@@ -55,6 +57,7 @@ y_test7=(y_test==7).astype(int)
 y_test8=(y_test==8).astype(int)
 y_test9=(y_test==9).astype(int)
 
+#sigmoid function
 def sigmoid(z):
     return 1.0 / (1 + np.exp(-z))
 
@@ -70,12 +73,14 @@ def forwardback(x,y,w,b):
   db = (1 / m) * np.sum(sig - y)
   return j, dw, db
 
+#prediction fucntion
 def predict(x, w, b):
   z = np.dot(x,w)+b
   Yhat_prob = sigmoid(z)
   Yhat = np.round(Yhat_prob).astype(int)
   return Yhat, Yhat_prob
 
+#gradient descent algorithm for optimization
 def gradient_descent(x, y, w, b, alpha, iterations):
   costs = []
   for i in range(iterations):
@@ -85,6 +90,8 @@ def gradient_descent(x, y, w, b, alpha, iterations):
     costs.append(j)
   return costs, w, b
 
+
+#logistic regression using gradient for optimization which returns a linear classifier
 def LogisticRegression(x_train, x_test, y_train,y_test, alpha, iterations):
   features = x_train.shape[1]
   w = np.zeros((features,1))
@@ -109,11 +116,12 @@ y_train_list = [y_train0, y_train1, y_train2, y_train3, y_train4, y_train5,
                 y_train6, y_train7, y_train8, y_train9]
 y_test_list = [y_test0, y_test1, y_test2, y_test3, y_test4, y_test5,
                 y_test6, y_test7, y_test8, y_test9]
-for i in range(10):
+for i in range(10): #create a classifier for each number 0-9
   logreg = LogisticRegression(x_train, x_test, y_train_list[i], y_test_list[i], 0.01, 100)
   print('Classifier', i, 'Accuracy:', logreg['test_accuracy'])
   classifiers_list.append(logreg)
 
+#one vs all function that weights test data against all classifiers
 def one_vs_all(data, classifiers_list):
   pred_matrix = np.zeros((data.shape[0], 10))
   for i in range(len(classifiers_list)):
@@ -130,7 +138,7 @@ def one_vs_all(data, classifiers_list):
   labels = np.vstack(labels).flatten()
   return labels
 
-
+#calculate accuracy and confusion matrix and print
 pred_label = one_vs_all(x_test, classifiers_list)
 conf_matrix = confusion_matrix(y_test, pred_label)
 totalAccuracy = accuracy_score(y_test, pred_label)
