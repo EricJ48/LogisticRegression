@@ -61,6 +61,7 @@ y_test9=(y_test==9).astype(int)
 def sigmoid(z):
     return 1.0 / (1 + np.exp(-z))
 
+#forwardback function used in gradient descent
 def forwardback(x,y,w,b):
   m = x.shape[0]
   dw = np.zeros((w.shape[0], 1))
